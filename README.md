@@ -4,7 +4,7 @@ High performance Json Rest API for GeoIP and Grok named-regex.
 It was written in scala using akka and spray technology.
 
 ## Usage
-Start service by issu command line as follow.
+Start service by run at command line as follow.
 
     TEMPLAR-SERVICE_HOME/bin/templar-service [-options]
 
