@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+curl -XPOST 'http://localhost:10000/grok/compile' -H "Content-Type: application/json" -d '{ "pattern" : "%{IPORHOST:clientip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:access_datetime}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent}" }'
+curl -XGET 'http://localhost:10000/grok/compile?pattern=%{IPORHOST:clientip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:access_datetime}\\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent}'
