@@ -43,12 +43,26 @@ If it's ok, it will return pattern id.
 
     http://hostname:port/grok/extract
 
-### GeIP Service
-
 Content must written in json format like this.
 
     { "patternId" : patternId, "data" : "ANY DATA" }
-    
+
+### GeIP Service
+
+    http://hostname:port/geoip/command??????
+
+Used for get location information from ip address. We used GeoLite2 databases and api from MaxMind.
+
+Available commands :-
+
+    info            ip=ip address
+    country         ip=ip address
+    region          ip=ip address
+    city            ip=ip address
+    organization    ip=ip address
+    location        ip=ip address
+    distance        from=ip address, to=ip address
+
 ## Examples
 In examples, we will use **curl** utility.
 
@@ -83,3 +97,7 @@ In examples, we will use **curl** utility.
     curl -XGET 'http://localhost:10000/geoip/organization?ip=111.73.45.49'
     curl -XGET 'http://localhost:10000/geoip/location?ip=111.73.45.49'
     curl -XGET 'http://localhost:10000/geoip/distance?from=111.73.45.49&to=66.249.77.31'
+
+##### Notes :-
+This product includes GeoLite2 data created by MaxMind, available from
+<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
