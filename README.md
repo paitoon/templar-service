@@ -1,4 +1,5 @@
-# templar-service
+# Templar Web Service
+
 High performance Json Rest API for GeoIP and Grok named-regex.
 It was written in scala using akka and spray technology.
 
@@ -18,10 +19,12 @@ Available option :-
           --version       Print version
 
 ## All Services
+
 templar-service has two services - Grok and GeoIP services.
 Support both POST and GET methods.
 
 ### Grok Service
+
 Used for extracting data from defined pattern. You must compile pattern first and then
 extract data from pattern id. URL as follow.
 
