@@ -50,7 +50,7 @@ Content must written in json format like this.
 
     { "patternId" : patternId, "data" : "ANY DATA" }
 
-### GeIP Service
+### GeoIP Service
 
     http://hostname:port/geoip/command??????
 
