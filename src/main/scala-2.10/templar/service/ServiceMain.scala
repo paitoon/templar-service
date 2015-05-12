@@ -19,6 +19,7 @@ package templar.service
 
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
+import com.typesafe.config.ConfigFactory
 import org.apache.log4j.{RollingFileAppender, PatternLayout, Level, LogManager}
 import org.rogach.scallop.ScallopConf
 import org.slf4j.{LoggerFactory, Logger}
@@ -67,9 +68,15 @@ object ServiceMain {
 
 		logger.info("templar-service is starting...")
 
-		implicit val system = ActorSystem("Templar-Service")
+		val config = ConfigFactory.load()
+
+		implicit val system = ActorSystem("Templar", config)
 		val service = system.actorOf(Props[TemplarServiceActor], "templar-service")
 
 		IO(Http) ! Http.Bind(service, interface = "localhost", port = _port)
+
+		println("Press any key to exit...")
+		val i = Console.in.read()
+		system.shutdown();
 	}
 }

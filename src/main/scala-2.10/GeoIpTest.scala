@@ -1,7 +1,6 @@
-import java.io.File
-import java.net.InetAddress
+import java.io.BufferedReader
 
-import com.maxmind.geoip.{timeZone, regionName, LookupService}
+import scala.io.Source
 
 /*
  *
@@ -20,36 +19,30 @@ import com.maxmind.geoip.{timeZone, regionName, LookupService}
  *
  */
 
-/**
- * Created by paitoon on 5/3/15 AD.
- */
 object GeoIpTest {
-	def main(args: Array[String]) {
-		val cityService = new LookupService("./geoip/GeoLiteCity.dat", LookupService.GEOIP_MEMORY_CACHE );
-		val orgService = new LookupService(("./geoip/GeoIPASNum.dat"))
+	var br: BufferedReader = null
 
-		//val l2 = cityService.getLocation("111.73.45.49");
-		val l2 = cityService.getLocation("192.168.0.1");
-		if (l2 == null) {
-			println("Not found.")
-			return
+	def streamLine(head : String) : Stream[String] = {
+		/*
+		(head != null) match {
+			case false => Stream.empty
+			case true => streamLine(br.readLine())
 		}
-		println("countryCode: " + l2.countryCode +
-			"\n countryName: " + l2.countryName +
-			"\n region: " + l2.region +
-			"\n regionName: " + regionName.regionNameByCode(l2.countryCode, l2.region) +
-			"\n city: " + l2.city +
-			"\n postalCode: " + l2.postalCode +
-			"\n latitude: " + l2.latitude +
-			"\n longitude: " + l2.longitude +
-			"\n distance: " + l2.distance(l2) +
-			"\n metro code: " + l2.metro_code +
-			"\n area code: " + l2.area_code +
-			"\n timezone: " + timeZone.timeZoneByCountryAndRegion(l2.countryCode, l2.region));
+		*/
+		head #:: streamLine(br.readLine())
+	}
 
+	def infiniteList(head : Int) : Stream[Int] = {
+		head #:: infiniteList(head + 1)
+	}
 
-		println("\n organize: " + orgService.getOrg("111.73.45.49"))
-		cityService.close();
-		orgService.close();
+	def main(args: Array[String]): Unit = {
+		br = Source.fromFile("/Users/paitoon/logs/sample.log").bufferedReader()
+		var sline : Stream[String] = null
+		var line = br.readLine()
+		do {
+			sline = streamLine(br.readLine())
+			println(sline.head)
+		} while (sline.head != null)
 	}
 }

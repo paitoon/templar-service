@@ -17,26 +17,43 @@
 
 package templar.service
 
+import akka.actor.{ActorLogging, TypedActor}
+import akka.event.{LogSource, Logging}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.maxmind.geoip.LookupService
-import org.slf4j.{LoggerFactory, Logger}
 
 import collection.JavaConversions._
 
-/**
- * Created by paitoon on 5/3/15 AD.
- */
-class GeoIPService {
-	private val logger: Logger = LoggerFactory.getLogger(classOf[GeoIPService])
+case class IPNotFoundException(cause : String) extends Exception
+
+trait GeoIPService {
+	def getGeoIP(ipAddress : String) : Option[Result]
+	def getCountry(ipAddress : String) : Option[Result]
+	def getRegion(ipAddress : String) : Option[Result]
+	def getCity(ipAddress : String) : Option[Result]
+	def getOrganization(ipAddress : String) : Option[Result]
+	def getGeoLocation(ipAddress : String) : Option[Result]
+	def getDistance(fromIpAddress : String, toIpAddress : String) : Option[Result]
+}
+
+object GeoIPServiceImpl {
+	implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef] {
+		def genString(o: AnyRef): String = o.getClass.getName
+		override def getClazz(o: AnyRef): Class[_] = o.getClass
+	}
+}
+
+class GeoIPServiceImpl extends GeoIPService {
+	val logger = Logging(TypedActor.context.system, this)
 
 	private val cityService = new LookupService("./geoip/GeoLiteCity.dat", LookupService.GEOIP_MEMORY_CACHE);
 	private val orgService = new LookupService("./geoip/GeoIPASNum.dat", LookupService.GEOIP_MEMORY_CACHE)
 
-	def getGeoIp(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+	override def getGeoIP(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -57,15 +74,16 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getCountry(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+	override def getCountry(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -76,15 +94,16 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getRegion(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+	override def getRegion(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -95,15 +114,16 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getCity(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+	override def getCity(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -117,16 +137,18 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getOrganization(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+
+	override def getOrganization(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 		var org : Organization = null
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -136,15 +158,16 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getGeoLocation(ipAddress : String) : Return = {
-		val location = cityService.getLocation(ipAddress);
+	override def getGeoLocation(ipAddress: String): Option[Result] = {
+		val location = cityService.getLocation(ipAddress)
 
 		if (location == null) {
-			new Return("ERR", "Not found.")
+			Some(Result("ERR", "Not found."))
 		}
 		else {
 			val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -155,13 +178,14 @@ class GeoIPService {
 
 			val mapper = new ObjectMapper
 			val mapString = mapper.writeValueAsString(dataMap)
-			new Return("OK", mapString)
+
+			Some(Result("OK", mapString))
 		}
 	}
 
-	def getDistance(fromIpAddress : String, toIpAddress : String) : Return = {
-		val fromLocation = cityService.getLocation(fromIpAddress);
-		val toLocation = cityService.getLocation(toIpAddress);
+	override def getDistance(fromIpAddress: String, toIpAddress: String): Option[Result] = {
+		val fromLocation = cityService.getLocation(fromIpAddress)
+		val toLocation = cityService.getLocation(toIpAddress)
 		val distance = fromLocation.distance(toLocation)
 
 		val dataMap = new java.util.LinkedHashMap[String, Any]()
@@ -172,6 +196,7 @@ class GeoIPService {
 
 		val mapper = new ObjectMapper
 		val mapString = mapper.writeValueAsString(dataMap)
-		new Return("OK", mapString)
+
+		Some(Result("OK", mapString))
 	}
 }
